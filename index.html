@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>💐 Chúc mừng Ngày Phụ nữ Việt Nam 20/10 💐</title>
+<title>💐 Chúc mừng Ngày Phụ nữ Việt Nam 20/10, Mẹ yêu! 💐</title>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <style>
   body { margin:0; background:#fff; }
@@ -12,44 +12,91 @@
 <body>
 <div id="plot"></div>
 <script>
-  const n = 120;
-  const A = 1.995653, B = 1.27689, C = 8, petalNum = 3.6;
-  
-  const r = Array.from({length:n}, (_,i)=>i/(n-1));
-  const theta = Array.from({length:n}, (_,i)=>-2 + i*(20*Math.PI+2)/(n-1));
+function mod(a, b) {
+    return ((a % b) + b) % b;
+}
 
-  let R = [], THETA = [];
-  for(let i=0;i<n;i++){ R[i]=[]; THETA[i]=[]; for(let j=0;j<n;j++){ R[i][j]=r[j]; THETA[i][j]=theta[i]; } }
+const n = 200;
+const A = 1.995653;
+const B = 1.27689;
+const C = 8;
+const petalNum = 3.6;
 
-  let x = [], phi = [], y = [], R2 = [], X = [], Y = [], Z = [];
-  for(let i=0;i<n;i++){
-    x[i]=[]; phi[i]=[]; y[i]=[]; R2[i]=[]; X[i]=[]; Y[i]=[]; Z[i]=[];
-    for(let j=0;j<n;j++){
-      const t = THETA[i][j];
-      x[i][j] = 1 - 0.5 * ((5/4)*(1 - ((petalNum*t) % (2*Math.PI))/Math.PI)**2 - 0.25)**2;
-      phi[i][j] = (Math.PI/2) * Math.exp(-t/(C*Math.PI));
-      y[i][j] = A*(R[i][j]**2)*(B*R[i][j] - 1)**2 * Math.sin(phi[i][j]);
-      R2[i][j] = x[i][j]*(R[i][j]*Math.sin(phi[i][j]) + y[i][j]*Math.cos(phi[i][j]));
-      X[i][j] = R2[i][j]*Math.sin(THETA[i][j]);
-      Y[i][j] = R2[i][j]*Math.cos(THETA[i][j]);
-      Z[i][j] = x[i][j]*(R[i][j]*Math.cos(phi[i][j]) - y[i][j]*Math.sin(phi[i][j]));
+const r = Array.from({length: n}, (_, i) => i / (n - 1));
+const theta = Array.from({length: n}, (_, i) => -2 + i * ((20 * Math.PI) + 2) / (n - 1));
+
+let R = [], THETA = [];
+for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+        R.push(r[i]);
+        THETA.push(theta[j]);
     }
-  }
+}
 
-  Plotly.newPlot('plot', [{
-    type: 'surface',
+let X = [], Y = [], Z = [];
+for (let idx = 0; idx < R.length; idx++) {
+    let t = THETA[idx];
+    let Ri = R[idx];
+
+    let x_val = 1 - 0.5 * Math.pow(
+        ((5/4) * Math.pow(1 - mod(petalNum * t, 2 * Math.PI) / Math.PI, 2) - 0.25),
+        2
+    );
+    let phi = (Math.PI / 2) * Math.exp(-t / (C * Math.PI));
+    let y_val = A * Math.pow(Ri, 2) * Math.pow(B * Ri - 1, 2) * Math.sin(phi);
+    let R2 = x_val * (Ri * Math.sin(phi) + y_val * Math.cos(phi));
+
+    X.push(R2 * Math.sin(t));
+    Y.push(R2 * Math.cos(t));
+    Z.push(x_val * (Ri * Math.cos(phi) - y_val * Math.sin(phi)));
+}
+
+let i_idx = [], j_idx = [], k_idx = [];
+for (let i = 0; i < n - 1; i++) {
+    for (let j = 0; j < n - 1; j++) {
+        let p1 = i * n + j;
+        let p2 = p1 + 1;
+        let p3 = p1 + n;
+        let p4 = p3 + 1;
+
+        i_idx.push(p1); j_idx.push(p2); k_idx.push(p3);
+        i_idx.push(p2); j_idx.push(p4); k_idx.push(p3);
+    }
+}
+
+const reds_custom = [
+    [0.0, '#fff5f0'],
+    [0.2, '#fcbba1'],
+    [0.4, '#fc9272'],
+    [0.6, '#fb6a4a'],
+    [0.8, '#ef3b2c'],
+    [1.0, '#99000d']
+];
+
+Plotly.newPlot('plot', [{
+    type: 'mesh3d',
     x: X,
     y: Y,
     z: Z,
-    colorscale: 'Reds'
-  }], {
-    title: "💐 Chúc mừng Ngày Phụ nữ Việt Nam 20/10, Mẹ yêu! 💐",
+    i: i_idx,
+    j: j_idx,
+    k: k_idx,
+    colorscale: reds_custom,
+    intensity: Z,
+    showscale: true,
+    flatshading: true
+}], {
+    title: "<b>💐 Chúc mừng Ngày Phụ nữ Việt Nam 20/10, Mẹ Liên 💐</b>",
+    titlefont: {color: '#ef3b2c', size: 20},
     scene: {
-      xaxis: {visible:false},
-      yaxis: {visible:false},
-      zaxis: {visible:false}
+        xaxis: {visible: false},
+        yaxis: {visible: false},
+        zaxis: {visible: false},
+        camera: {
+            eye: {x: -1.2, y: 1.6, z: 1.0}
+        }
     }
-  });
+});
 </script>
 </body>
 </html>
