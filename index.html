@@ -1,1 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>💐 Chúc mừng Ngày Phụ nữ Việt Nam 20/10 💐</title>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<style>
+  body { margin:0; background:#fff; }
+  #plot { width:100vw; height:100vh; }
+</style>
+</head>
+<body>
+<div id="plot"></div>
+<script>
+  const n = 120;
+  const A = 1.995653, B = 1.27689, C = 8, petalNum = 3.6;
+  
+  const r = Array.from({length:n}, (_,i)=>i/(n-1));
+  const theta = Array.from({length:n}, (_,i)=>-2 + i*(20*Math.PI+2)/(n-1));
 
+  let R = [], THETA = [];
+  for(let i=0;i<n;i++){ R[i]=[]; THETA[i]=[]; for(let j=0;j<n;j++){ R[i][j]=r[j]; THETA[i][j]=theta[i]; } }
+
+  let x = [], phi = [], y = [], R2 = [], X = [], Y = [], Z = [];
+  for(let i=0;i<n;i++){
+    x[i]=[]; phi[i]=[]; y[i]=[]; R2[i]=[]; X[i]=[]; Y[i]=[]; Z[i]=[];
+    for(let j=0;j<n;j++){
+      const t = THETA[i][j];
+      x[i][j] = 1 - 0.5 * ((5/4)*(1 - ((petalNum*t) % (2*Math.PI))/Math.PI)**2 - 0.25)**2;
+      phi[i][j] = (Math.PI/2) * Math.exp(-t/(C*Math.PI));
+      y[i][j] = A*(R[i][j]**2)*(B*R[i][j] - 1)**2 * Math.sin(phi[i][j]);
+      R2[i][j] = x[i][j]*(R[i][j]*Math.sin(phi[i][j]) + y[i][j]*Math.cos(phi[i][j]));
+      X[i][j] = R2[i][j]*Math.sin(THETA[i][j]);
+      Y[i][j] = R2[i][j]*Math.cos(THETA[i][j]);
+      Z[i][j] = x[i][j]*(R[i][j]*Math.cos(phi[i][j]) - y[i][j]*Math.sin(phi[i][j]));
+    }
+  }
+
+  Plotly.newPlot('plot', [{
+    type: 'surface',
+    x: X,
+    y: Y,
+    z: Z,
+    colorscale: 'Reds'
+  }], {
+    title: "💐 Chúc mừng Ngày Phụ nữ Việt Nam 20/10, Mẹ yêu! 💐",
+    scene: {
+      xaxis: {visible:false},
+      yaxis: {visible:false},
+      zaxis: {visible:false}
+    }
+  });
+</script>
+</body>
+</html>
